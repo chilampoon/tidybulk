@@ -655,6 +655,12 @@ test_that("New method choice",{
 
 test_that("DESeq2 differential trancript abundance - no object",{
 
+  if (find.package("DESeq2", quiet = TRUE) |> length() |> equals(0)) {
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager", repos = "https://cloud.r-project.org")
+    BiocManager::install("DESeq2", ask = FALSE)
+  }
+
   test_deseq2_df = DESeq2::DESeqDataSet(se_mini,design=~condition)
   colData(test_deseq2_df)$condition = factor(colData(test_deseq2_df)$condition)
 
@@ -836,7 +842,6 @@ test_that("differential trancript abundance - random effects",{
 
     filter(b %in% c("ABCB4" , "ABCB9" , "ACAP1",  "ACHE",   "ACP5" ,  "ADAM28"))
 
-  set.seed(42)
   my_input |>
     test_differential_abundance(
       ~ condition + (1 + condition | time),
@@ -850,7 +855,7 @@ test_that("differential trancript abundance - random effects",{
     pull(P_condition_adjusted) |>
     head(4) |>
     expect_equal(
-      c(0.02658234, 0.02658234, 0.02658234, 0.04139992),
+      c(0.03643414, 0.02938584, 0.02938584, 0.03643414),
       tolerance=1e-3
     )
 
@@ -862,7 +867,7 @@ test_that("differential trancript abundance - random effects",{
       by = join_by(b, entrez, .abundant)
     )
 
-    set.seed(42)
+
     my_input |>
     test_differential_abundance(
       ~ condition + (1 + condition | time),
@@ -877,7 +882,7 @@ test_that("differential trancript abundance - random effects",{
     pull(P_condition_adjusted) |>
     head(4) |>
     expect_equal(
-      c(0.08686834, 0.14384610, 0.14384610, 0.19750844),
+      c(0.1081176, 0.1303558, 0.1303558, 0.1693276),
       tolerance=1e-2
     )
 

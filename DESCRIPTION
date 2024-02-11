@@ -1,7 +1,7 @@
 Type: Package
 Package: tidybulk
 Title: Brings transcriptomics to the tidyverse 
-Version: 1.15.5
+Version: 1.15.4
 Authors@R: c(person("Stefano", "Mangiola", email = "mangiolastefano@gmail.com",
                   role = c("aut", "cre")),
             person("Maria", "Doyle", email = "Maria.Doyle@petermac.org",
@@ -12,13 +12,13 @@ Description: This is a collection of utility functions that allow
     a modular, pipe-friendly and tidy fashion.
 License: GPL-3
 Depends:
-    R (>= 4.3.0),
-    ttservice
+    R (>= 4.1.0),
+    ttservice (>= 0.3.6)
 Imports:
     tibble,
     readr,
-    dplyr (>= 1.1.0),
     magrittr,
+    dplyr (>= 1.1.0),
     tidyr,
     stringi,
     stringr,
@@ -36,56 +36,57 @@ Imports:
     methods,
     S4Vectors,
     crayon,
-    Matrix,
-    pkgconfig,
-    AnnotationDbi,
-    DESeq2,
-    Rtsne,
-    Seurat,
-    betareg,
-    boot,
-    broom, 
-    class, 
-    clusterProfiler, 
-    e1071, 
-    edgeR,
-    functional, 
-    glmmSeq, 
-    glmmTMB, 
-    limma, 
-    lme4, 
-    matrixStats,
-    msigdbr, 
-    org.Hs.eg.db,
-    org.Mm.eg.db, 
-    pbapply, 
-    pbmcapply,
-    survival,
-    survminer, 
-    sva, 
-    uwot,
-    widyr
+    Matrix
 Suggests:
-    tidySummarizedExperiment,
-    tidyHeatmap,
     BiocStyle,
     testthat,
     vctrs,
+    AnnotationDbi,
     BiocManager,
     Rsubread,
+    e1071,
+    edgeR,
+    limma,
+    org.Hs.eg.db,
+    org.Mm.eg.db,
+    sva,
     GGally,
     knitr,
     qpdf,
     covr,
+    Seurat,
     KernSmooth,
+    Rtsne,
     ggplot2,
+    widyr,
+    clusterProfiler,
+    msigdbr,
+    DESeq2,
+    broom,
+    survival,
+    boot,
+    betareg,
+    tidyHeatmap,
     pasilla,
     ggrepel,
+    devtools,
+    functional,
+    survminer,
+    tidySummarizedExperiment,
     markdown,
+    uwot,
+    matrixStats,
     igraph,
+    EGSEA,
     IRanges,
     here,
-    MASS
+    glmmSeq,
+    pbapply,
+    pbmcapply,
+    lme4,
+    glmmTMB,
+    MASS,
+    pkgconfig
 VignetteBuilder: 
     knitr
 RdMacros:
@@ -94,7 +95,7 @@ Biarch: true
 biocViews: AssayDomain, Infrastructure, RNASeq, DifferentialExpression, GeneExpression, Normalization, Clustering, QualityControl, Sequencing, Transcription, Transcriptomics
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.0
 LazyDataCompression: xz
 URL: https://github.com/stemangiola/tidybulk
 BugReports: https://github.com/stemangiola/tidybulk/issues
+RoxygenNote: 7.3.0

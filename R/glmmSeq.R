@@ -164,9 +164,7 @@ glmmTMB_standard_error = function (model){
 #' @importFrom purrr map2_dfc
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
-#' @importFrom dplyr left_join
 #' @importFrom dplyr join_by
-#' @importFrom dplyr select
 #'
 #' @keywords internal
 #' @noRd
@@ -183,7 +181,7 @@ glmmTMB_to_confidence_intervals_random_effects = function(fit){
         "group_id" |>
           c(sprintf("%s__%s", .y, colnames(.x)))
       ) |>
-      tidyr::pivot_longer(-group_id, names_to = "parameter", values_to = "CI")
+      pivot_longer(-group_id, names_to = "parameter", values_to = "CI")
   )
 
   mod = glmmTMB::ranef(fit, condVar=T)$cond
@@ -195,15 +193,15 @@ glmmTMB_to_confidence_intervals_random_effects = function(fit){
         "group_id" |>
           c(sprintf("%s__%s", .y, colnames(.x)))
       ) |>
-      tidyr::pivot_longer(-group_id, names_to = "parameter", values_to = "mode")
+      pivot_longer(-group_id, names_to = "parameter", values_to = "mode")
   )
 
   mod |>
-    dplyr::left_join(ster, dplyr::join_by(group_id, parameter)) |>
-    dplyr::mutate(lower = mode - CI, upper = mode + CI) |>
-    dplyr::select(-CI) |>
+    left_join(ster, join_by(group_id, parameter)) |>
+    mutate(lower = mode - CI, upper = mode + CI) |>
+    select(-CI) |>
     tidyr::unite("parameter", c(group_id, parameter), sep="_") |>
-    tidyr::pivot_wider(names_from = parameter, values_from = c(lower, mode, upper), names_glue = "{parameter}__{.value}")
+    pivot_wider(names_from = parameter, values_from = c(lower, mode, upper), names_glue = "{parameter}__{.value}")
 }
 
 
@@ -422,13 +420,6 @@ setClassUnion("formulaOrNULL", c("formula", "NULL"))
 #'
 #' @keywords internal
 #' @noRd
-#' 
-#' @import lme4
-#' @importFrom glmmTMB glmmTMBControl
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterExport
-#' @importFrom pbapply pblapply
-#' @importFrom pbmcapply pbmclapply
 #'
 #' @slot info List including the matched call, dispersions, offset, designMatrix
 #' @slot formula The model formula
@@ -576,7 +567,7 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
       resultList <- lapply(fullList, function(geneList) {
         glmerCore(geneList, fullFormula, reduced,
                   subsetMetadata, control, offset, modelData,
-                  designMatrix, hyp.matrix, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
+                  designMatrix, hyp.matrix,, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
       })
     }
     else if (Sys.info()["sysname"] == "Windows" & cores > 1) {
@@ -588,6 +579,14 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
                    "offset", "designMatrix", "hyp.matrix", "dots")
       clusterExport(cl, varlist = varlist, envir = environment())
       if (progress) {
+
+        # Check if package is installed, otherwise install
+        if (find.package("pblapply", quiet = TRUE) %>% length %>% equals(0)) {
+          message("tidybulk says: Installing pblapply needed for differential transcript abundance analyses")
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+            install.packages("BiocManager", repos = "https://cloud.r-project.org")
+          BiocManager::install("pblapply", ask = FALSE)
+        }
 
         resultList <- pbapply::pblapply(fullList, function(geneList) {
           args <- c(list(geneList = geneList, fullFormula = fullFormula,
@@ -618,9 +617,8 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
       }
     }
     else {
-
       if(avoid_forking){
-        #library(parallel)
+        library(parallel)
         cl = parallel::makeCluster(cores, type = "PSOCK")
         #parallel::clusterEvalQ(cl,c(library(dplyr),library(glmmSeq)))
         #clusterExport(cl, list("varname1", "varname2"),envir=environment())
@@ -630,7 +628,7 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
           function(geneList) {
             glmerCore(geneList, fullFormula, reduced,
                       subsetMetadata, control, offset, modelData,
-                      designMatrix, hyp.matrix, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
+                      designMatrix, hyp.matrix,, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
           }
         )
       } 
@@ -644,11 +642,10 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
           BiocManager::install("pbmcapply", ask = FALSE)
         }
         
-
         resultList <- pbmcapply::pbmclapply(fullList, function(geneList) {
           glmerCore(geneList, fullFormula, reduced,
                     subsetMetadata, control, offset, modelData,
-                    designMatrix, hyp.matrix, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
+                    designMatrix, hyp.matrix, , max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
         }, mc.cores = cores)
         if ("value" %in% names(resultList)) resultList <- resultList$value
         
@@ -657,7 +654,7 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
         resultList <- mclapply(fullList, function(geneList) {
           glmerCore(geneList, fullFormula, reduced,
                     subsetMetadata, control, offset, modelData,
-                    designMatrix, hyp.matrix, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
+                    designMatrix, hyp.matrix,, max_rows_for_matrix_multiplication = max_rows_for_matrix_multiplication, ...)
         }, mc.cores = cores)
 
       }
@@ -690,6 +687,14 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
       parallel::clusterExport(cl, varlist = varlist, envir = environment())
       if (progress) {
 
+        # Check if package is installed, otherwise install
+        if (find.package("pblapply", quiet = TRUE) %>% length %>% equals(0)) {
+          message("tidybulk says: Installing pblapply needed for differential transcript abundance analyses")
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+            install.packages("BiocManager", repos = "https://cloud.r-project.org")
+          BiocManager::install("pblapply", ask = FALSE)
+        }
+
         resultList <- pbapply::pblapply(fullList, function(geneList) {
           args <- c(list(geneList = geneList, fullFormula = fullFormula,
                          reduced = reduced, data = subsetMetadata,
@@ -714,6 +719,14 @@ glmmSeq = function (modelFormula, countdata, metadata, id = NULL, dispersion = N
     }
     else {
       if (progress) {
+
+        # Check if package is installed, otherwise install
+        if (find.package("pbmcapply", quiet = TRUE) %>% length %>% equals(0)) {
+          message("tidybulk says: Installing pbmcapply needed for differential transcript abundance analyses")
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+            install.packages("BiocManager", repos = "https://cloud.r-project.org")
+          BiocManager::install("pbmcapply", ask = FALSE)
+        }
 
         resultList <- pbmcapply::pbmclapply(fullList, function(geneList) {
           glmmTMBcore(geneList, fullFormula, reduced,

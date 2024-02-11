@@ -34,9 +34,8 @@ log10_reverse_trans <- function() {
 #' @description it perform logit scaling with right axis formatting. To not be used directly but with ggplot (e.g. scale_y_continuous(trans = "log10_reverse") )
 #'
 #' @importFrom scales label_scientific
-#' @importFrom scales trans_new
 #' @importFrom scales extended_breaks
-#' @importFrom functional Compose
+#' @importFrom stats qlogis plogis
 #'
 #' @return A scales object
 #'
@@ -52,6 +51,12 @@ log10_reverse_trans <- function() {
 #'
 #' @export
 logit_trans <- function(){
+
+
+  if (find.package("functional", quiet = TRUE) %>% length %>% equals(0)) {
+    message("Installing functional needed for analyses")
+    install.packages("functional", repos = "https://cloud.r-project.org")
+  }
 
   trans <- qlogis
   inv <- plogis

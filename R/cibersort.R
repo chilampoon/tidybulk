@@ -202,11 +202,8 @@ call_core = function(itor, Y, X, P, pval, CoreAlg){
 }
 
 
-#' @import e1071
-#' @import parallel
-#' @import preprocessCore
 #' @importFrom stats sd
-#' @importFrom matrixStats colSds
+#' @importFrom utils install.packages
 #'
 #' @keywords internal
 #'
@@ -257,6 +254,12 @@ my_CIBERSORT <- function(Y, X, perm=0, QN=TRUE, cores = 3, exp_transform = FALSE
       colnames(Y)[colSums(Y)==0] %>% paste(collapse = ", ")
     ))
   Y=Y[,colSums(Y)>0, drop=FALSE]
+
+  # Check if package is installed, otherwise install
+  if (find.package("matrixStats", quiet = TRUE) %>% length %>% equals(0)) {
+    message("tidybulk says: Installing matrixStats needed for cibersort")
+    install.packages("matrixStats", repos = "https://cloud.r-project.org")
+  }
 
   # Eliminate sd == 0
   if(length(which(matrixStats::colSds(Y)==0))>0)

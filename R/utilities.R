@@ -1110,12 +1110,7 @@ do_validate = function(){
 #'
 #' @importFrom stringr str_remove
 #' @importFrom stringr str_replace_all
-#' @importFrom betareg betareg
-#' @importFrom broom tidy
-#' @importFrom boot logit
-#' @importFrom survival coxph
-#' @importFrom survminer surv_fit
-#' @importFrom survminer ggsurvplot
+#'
 multivariable_differential_tissue_composition = function(
 	deconvoluted,
 	method,
@@ -1138,6 +1133,16 @@ multivariable_differential_tissue_composition = function(
 		# Beta or Cox
 		when(
 			grepl("Surv", .my_formula) %>% any ~ {
+				# Check if package is installed, otherwise install
+				if (find.package("survival", quiet = TRUE) %>% length %>% equals(0)) {
+					message("Installing betareg needed for analyses")
+					install.packages("survival", repos = "https://cloud.r-project.org")
+				}
+
+				if (find.package("boot", quiet = TRUE) %>% length %>% equals(0)) {
+					message("Installing boot needed for analyses")
+					install.packages("boot", repos = "https://cloud.r-project.org")
+				}
 
 				(.) %>%
 					survival::coxph(.my_formula, .)	%>%
@@ -1196,6 +1201,16 @@ univariable_differential_tissue_composition = function(
 				.x %>%
 					when(
 						grepl("Surv", .my_formula) %>% any ~ {
+							# Check if package is installed, otherwise install
+							if (find.package("survival", quiet = TRUE) %>% length %>% equals(0)) {
+								message("Installing betareg needed for analyses")
+								install.packages("survival", repos = "https://cloud.r-project.org")
+							}
+
+							if (find.package("boot", quiet = TRUE) %>% length %>% equals(0)) {
+								message("Installing boot needed for analyses")
+								install.packages("boot", repos = "https://cloud.r-project.org")
+							}
 
 							(.) %>%
 								mutate(.proportion_0_corrected = .proportion_0_corrected  %>% boot::logit()) %>%
@@ -1204,7 +1219,11 @@ univariable_differential_tissue_composition = function(
 								select(-term)
 						} ,
 						~ {
-
+							# Check if package is installed, otherwise install
+							if (find.package("betareg", quiet = TRUE) %>% length %>% equals(0)) {
+								message("Installing betareg needed for analyses")
+								install.packages("betareg", repos = "https://cloud.r-project.org")
+							}
 							(.) %>%
 								betareg::betareg(.my_formula, .) %>%
 								broom::tidy() %>%
@@ -1225,6 +1244,24 @@ univariable_differential_tissue_stratification = function(
 	method,
 	.my_formula
 ){
+
+	# Check if package is installed, otherwise install
+	if (find.package("survival", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing survival needed for analyses")
+		install.packages("survival", repos = "https://cloud.r-project.org")
+	}
+
+	# Check if package is installed, otherwise install
+	if (find.package("survminer", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing survminer needed for analyses")
+		install.packages("survminer", repos = "https://cloud.r-project.org")
+	}
+
+
+	if (find.package("broom", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing broom needed for analyses")
+		install.packages("broom", repos = "https://cloud.r-project.org")
+	}
 
 	deconvoluted %>%
 
@@ -1280,16 +1317,29 @@ univariable_differential_tissue_stratification = function(
 		unnest(surv_test, keep_empty = TRUE)
 }
 
-#' @importFrom tidyr nest
-#' @importFrom survival survdiff
-#' @importFrom survminer surv_fit
-#' @importFrom survminer ggsurvplot
-#' @importFrom broom tidy
 univariable_differential_tissue_stratification_SE = function(
 	deconvoluted,
 	method,
 	.my_formula
 ){
+
+	# Check if package is installed, otherwise install
+	if (find.package("survival", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing survival needed for analyses")
+		install.packages("survival", repos = "https://cloud.r-project.org")
+	}
+
+	# Check if package is installed, otherwise install
+	if (find.package("survminer", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing survminer needed for analyses")
+		install.packages("survminer", repos = "https://cloud.r-project.org")
+	}
+
+
+	if (find.package("broom", quiet = TRUE) %>% length %>% equals(0)) {
+		message("Installing broom needed for analyses")
+		install.packages("broom", repos = "https://cloud.r-project.org")
+	}
 
 	deconvoluted %>%
 

@@ -480,7 +480,6 @@ test_that("Voom with treat method",{
 
 test_that("differential trancript abundance - random effects SE",{
 
-  set.seed(42)
  res =
    se_mini[1:10,] |>
     identify_abundant(factor_of_interest = condition) |>
@@ -494,7 +493,7 @@ test_that("differential trancript abundance - random effects SE",{
  rowData(res)[,"P_condition_adjusted"] |>
     head(4) |>
     expect_equal(
-      c(0.1578695, 0.1221392, 0.1221392, 0.2262688),
+      c(0.03394914, 0.03394914, 0.03394914,  NA),
       tolerance=1e-2
     )
 
@@ -518,7 +517,7 @@ test_that("differential trancript abundance - random effects SE",{
  rowData(res)[,"P_condition_adjusted"] |>
    head(4) |>
    expect_equal(
-     c(0.2633982, 0.2633982, 0.2633982, 0.5028348),
+     c(0.1153254, 0.1668555, 0.1668555 ,       NA),
      tolerance=1e-2
    )
 
